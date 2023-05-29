@@ -1,0 +1,120 @@
+#!/bin/bash
+#Nécessite :
+# pip install snapmap-archiver==2.0.2 et python3.1O ou moins.
+# il faut utiliser JQ sur Bash.
+# Il faut créer un fichier "location" avec marqué LIEU + GEOLOCALISATION GPS pour que le script fonctionne.
+# dans un feed rss ajouter : http://127.0.0.1:8556/(le repertoire ou se trouve monitoring.xml)
+# iframe doit être activé sur votre lecteur de flux RSS
+
+current_dir=$(dirname $(realpath -s $0))
+var_location=$(awk 'NR % 2 == 1' $current_dir/location)
+IFS=$'\n'
+lines=($var_location)
+
+#CREATION DES DOSSIERS A PARTIR DE LOCATION
+for line in "${lines[@]}"; do
+    if [ ! -d $current_dir/$line ]; then
+    mkdir -p $line
+    fi
+done
+########################
+# CREATION DU XML S'IL N'EXISTE PAS et S'IL EST VIDE LE REMPLIR
+########################
+if [ ! -f $current_dir/monitoring.xml ]; then
+    touch "$current_dir/monitoring.xml"
+fi
+
+if [ $(wc -l < $current_dir/monitoring.xml) -lt 2 ]; then
+    echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" > $current_dir/monitoring.xml
+    echo "<rss version=\"2.0\">" >> $current_dir/monitoring.xml
+    echo "<channel>" >> $current_dir/monitoring.xml
+    echo "<title>SNAPRSS</title>" >> $current_dir/monitoring.xml
+    echo "<link>http://map.snapchat.com</link>" >> $current_dir/monitoring.xml
+    echo "<description>The New snap</description>" >> $current_dir/monitoring.xml
+fi
+
+#Ouverture ou nom du fichier xml
+if grep -q "</rss>" $current_dir/monitoring.xml;then
+sed -i '$d' $current_dir/monitoring.xml
+sed -i '$d' $current_dir/monitoring.xml
+fi
+
+# UTILISATION DE SNAPMAP-ARCHIVER EN UTILISANT UN LOCATION TEMPO
+cat $current_dir/location > $current_dir/tempo2
+while [ "$(wc -l < $current_dir/tempo2)" -gt 0 ];do
+tempo=($(head -n 2 $current_dir/tempo2))
+declare -a tempo
+IFS=$'\n'
+snapmap-archiver -o $current_dir/${tempo[0]}/ -l="${tempo[1]}" -r 1000 --write-json
+#creation d'un fichier temporaire qui prend en compte les nouveaux fichiers.
+# condition d'exécution, le fichier doit avoir plus de 2 lignes
+    if [ $(wc -l < $current_dir/${tempo[0]}/archive.json) -lt 2 ]; then
+    echo "Le fichier fait moins de 2 lignes et a été supprimé"
+    # si moins de 2 lignes pas de nouvelles données, suppression de archive.json.tempo.
+        if [ -e $current_dir/${tempo[0]}/archive.json.tempo ]; then rm $current_dir/${tempo[0]}/archive.json.tempo; fi
+    else
+    jq -r '.[] | .create_time, .snap_id, .file_type, .url' $current_dir/${tempo[0]}/archive.json > $current_dir/${tempo[0]}/archive.json.tempo
+    fi
+sed -i '1,2d' $current_dir/tempo2
+done
+rm $current_dir/tempo2
+
+###
+cat $current_dir/location > $current_dir/tempo2
+#jq -r '.[] | .create_time, .snap_id, .file_type, .url' archive.json > archive.json.tempo
+while [ "$(wc -l < $current_dir/tempo2)" -gt 0 ];do
+tempo=($(head -n 2 $current_dir/tempo2))
+declare -a tempo
+IFS=$'\n'
+# si le fichier archive.json.tempo existe : faire ... Sinon rien faire.
+echo "$tempo est en cours de traitement"
+
+if [ ! -f $current_dir/${tempo[0]}/archive.json.tempo ];then
+    sed -i '1,2d' $current_dir/tempo2 #retour automatique à la ligne
+else
+    while [ "$(wc -l < $current_dir/${tempo[0]}/archive.json.tempo)" -gt 0 ];do
+            json=($(head -n 4 $current_dir/${tempo[0]}/archive.json.tempo)) # a modifier
+            declare -a json
+            datetempo=$(echo ${json[0]} | cut -c 1-10) # sans doute retirer le cut : nouveau format de date 1674553519.338 qui semble passer en entier.
+            datejson=$(date -Rud @$datetempo)
+            shorturl=$(echo ${json[3]} | rev | cut -c13- | rev)
+            #creation du tableau
+                if grep -q "${json[1]}" $current_dir/monitoring.xml;then #verification que le fichier existe pas déjà
+                sed -i '1,4d' $current_dir/${tempo[0]}/archive.json.tempo
+
+                elif [ "${json[2]}" == "jpg" ];then
+                echo "<item>" >> $current_dir/monitoring.xml
+                echo "<title>${tempo[0]} - ${json[1]}</title>" >> $current_dir/monitoring.xml
+                echo "<link>$shorturl</link>" >> $current_dir/monitoring.xml
+                echo -e '<description><![CDATA[<img src="\c' >> $current_dir/monitoring.xml
+                echo -e "http://127.0.0.1:8556/${tempo[0]}/${json[1]}.${json[2]}\c" >> $current_dir/monitoring.xml
+                echo -e '"/>]]>\c' >> $current_dir/monitoring.xml
+                echo -e "</description>\c" >> $current_dir/monitoring.xml
+                echo "<pubDate>$datejson</pubDate>" >> $current_dir/monitoring.xml
+                echo "</item>" >> $current_dir/monitoring.xml
+                sed -i '1,4d' $current_dir/${tempo[0]}/archive.json.tempo
+
+                else [ "${json[2]}" == "mp4" ];
+                echo "<item>" >> $current_dir/monitoring.xml
+                echo "<title>${tempo[0]} - ${json[1]}</title>" >> $current_dir/monitoring.xml
+                echo "<link>$shorturl</link>" >> $current_dir/monitoring.xml
+                echo -e '<description><![CDATA[<iframe width="1080" height="1920" src="\c' >> $current_dir/monitoring.xml
+                echo -e "http://127.0.0.1:8556/${tempo[0]}/${json[1]}.${json[2]}\c" >> $current_dir/monitoring.xml
+                echo -e '"/> ]]>\c' >> $current_dir/monitoring.xml
+                echo -e "</description>\c" >> $current_dir/monitoring.xml
+                echo "<pubDate>$datejson</pubDate>" >> $current_dir/monitoring.xml
+                echo "</item>" >> $current_dir/monitoring.xml
+                sed -i '1,4d' $current_dir/${tempo[0]}/archive.json.tempo
+                fi
+    done
+rm $current_dir/${tempo[0]}/archive.json.tempo
+fi
+done
+rm $current_dir/tempo2
+
+if ! grep -q "</rss>" $current_dir/monitoring.xml;then
+echo "</channel>" >> $current_dir/monitoring.xml
+echo "</rss>" >> $current_dir/monitoring.xml
+fi
+timeout 1800 python3 -m http.server 8556 --bind 127.0.0.1 -d $current_dir/
+pkill -9 -f 'python3 -m http.server'
