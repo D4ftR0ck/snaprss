@@ -61,7 +61,6 @@ rm $current_dir/tempo2
 
 ###
 cat $current_dir/location > $current_dir/tempo2
-#jq -r '.[] | .create_time, .snap_id, .file_type, .url' archive.json > archive.json.tempo
 while [ "$(wc -l < $current_dir/tempo2)" -gt 0 ];do
 tempo=($(head -n 2 $current_dir/tempo2))
 declare -a tempo
