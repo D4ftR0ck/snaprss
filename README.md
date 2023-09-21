@@ -19,3 +19,11 @@ The data is then put into an XML file "monitoring.xml" which you can add to an r
 My program requires the JQ librairy in bash and snapmap version 2.0.2.
 
 An example is available in the location file. You can either use python's temporary html server or set up a local server with apache or nginx.
+
+---
+
+Install requierement :
+
+- Python 3.9 or more
+- pip install snapmap-archiver==2.0.2
+- apt install jq
