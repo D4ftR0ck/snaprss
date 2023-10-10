@@ -94,11 +94,9 @@ myliste=("$titre" "$titre2" "$pseudo" "$pseudo2" "$pageTitle" "$datareacthelmet"
 last=""
 for var in "${myliste[@]}"; do
 if [[ "$var" != "$last" ]]; then
-    echo "1 - $last = $var"
     if [[ ! $var =~ [[:space:]] && $var =~ ([a-z]|-_\.|[0-9]) && ! $var =~ [A-Z] ]]; then
     echo "Probable Owner: https://www.snapchat.com/add/$var<br >" >> "$nom_fichier"
     last="$var"
-    echo "3 - $last = $var"
     fi
 fi
 done
