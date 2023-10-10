@@ -27,3 +27,10 @@ Install requierement :
 - Python 3.9 or more
 - pip install snapmap-archiver==2.0.2
 - apt install jq
+
+---
+
+# snaprss_html.sh
+
+A stand-alone program that requires the jq library and creates an array in an html page containing the elements.
+
