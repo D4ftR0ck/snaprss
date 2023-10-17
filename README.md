@@ -2,7 +2,7 @@
 
 A stand-alone program that requires the jq library and creates an array in an html page containing the elements.
 
-Pivot from the snap snap_ID retrieved from the Snapmap.
+Pivot from the snap snap_ID retrieved from the Snapmap. You only need GPS coordinates.
 
 https://www.snapchat.com/spotlight/(snap_ID)
 
