@@ -10,7 +10,7 @@ https://www.snapchat.com/add/(User)
 
 ---
 
-# snaprss
+# snaprss.sh (monitoring)
 
 When you retrieve a snap ID from the snapmap, you can identify the snap owner. Several identification elements are available on the snapchat web application.
 I give 6 different elements that can provide information about the snap's user.
@@ -23,19 +23,18 @@ My script gives the probable snap owner.
 
 ---
 
-I use @king-millez's snapmap-archiver application to retrieve snaps from the snap map. I automate the process with a "location" file that lets you put a name and GPS coordinates, as well as the retrieval distance 500, 1000 or more.
-https://github.com/king-millez/snapmap-archiver
-
 The data is then put into an XML file "monitoring.xml" which you can add to an rss feed aggregator.
 
-My program requires the JQ librairy in bash and snapmap version 2.0.2.
+My program requires the JQ librairy
 
 An example is available in the location file. You can either use python's temporary html server or set up a local server with apache or nginx.
 
 ---
 
 Install requierement :
-
-- Python 3.9 or more
-- pip install snapmap-archiver==2.0.2
 - apt install jq
+
+---
+
+The scripts are self-contained and only require JQ. Originally I used the king-millez script: https://github.com/king-millez/snapmap-archiver
+I thank him for what he created.
