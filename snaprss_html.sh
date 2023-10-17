@@ -6,6 +6,9 @@ read lat_lon
 lat=$(echo $lat_lon | sed 's/ //g' | cut -d ',' -f1)
 lon=$(echo $lat_lon | sed 's/ //g' | cut -d ',' -f2)
 
+echo "Name the file :"
+read namefile
+
 epoch=$(curl -X POST "https://ms.sc-jpl.com/web/getLatestTileSet" -H "Content-Type: application/json" -d '{}' | jq -r .tileSetInfos[1].id.epoch)
 # or grep -oE '{"type":"HEAT","flavor":"default","epoch":"[0-9]+"\}' | grep -o "[0-9]*")
 
@@ -15,8 +18,10 @@ sed -i -e 's/SNAP_MEDIA_TYPE_VIDEO_NO_SOUND/mp4/g' -e 's/SNAP_MEDIA_TYPE_VIDEO/m
 
 jq -r '.[] | .create_time, .snap_id, .file_type, .url' archive.json > archive.json.tempo
 
-nom_fichier="snap.html"
+# Nom du fichier HTML
+nom_fichier=$(echo "$namefile.html")
 
+# Ouvrir du fichier HTML
 echo "<html>" > "$nom_fichier"
 echo "<head>" >> "$nom_fichier"
 echo "<title>SNAPRSS HTML</title>" >> "$nom_fichier"
@@ -24,10 +29,11 @@ echo "</head>" >> "$nom_fichier"
 echo "<body>" >> "$nom_fichier"
 echo "<h1>Report Snaprss</h1>" >> "$nom_fichier"
 
+# Créer un tableau HTML
 echo "<table border='1'>" >> "$nom_fichier"
 echo "<tr><th>Snap html</th></tr>" >> "$nom_fichier"
 
-#Work
+#Traitement
 while [ "$(wc -l < archive.json.tempo)" -gt 0 ];do
 json=($(head -n 4 archive.json.tempo))
 declare -a json
@@ -35,14 +41,14 @@ datesnap=$(echo ${json[0]} | cut -c 1-10)
 realdate=$(date -d @$datesnap) # add 'u' for universal time UTC
 # shorturl=$(echo ${json[3]} | rev | cut -c13- | rev)
 
-if grep -q "${json[1]}" "snap.html";then #verification que l'id existe pas déjà
+#REMPLISSAGE DU TABLEAUsnap.html
+if grep -q "${json[1]}" "$nom_fichier";then
 sed -i '1,4d' archive.json.tempo
 else
-
-sleep $((3 + RANDOM % 5))
+sleep $((5 + RANDOM % 7))
 echo "Work with, create time: ${json[0]}, snap id : ${json[1]}, file type : ${json[2]}, url : ${json[3]}"
 
-curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.snapchat.com/spotlight/${json[1]}" > urltempo  # /spotlight/ fonctionne aussi. avec www ou https://story.snapchat.com/o/
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.snapchat.com/spotlight/${json[1]}" > urltempo  # or https://story.snapchat.com/o/
 titre=$(grep -o '"title":"[^"]*"' urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ':' -f 2)
 titre2=$(grep -o '"title":"[^"]*"' urltempo | head -n 1 | sed 's/"//g' | cut -d ':' -f 2)
 pseudo=$(grep -o '"subtitle":"[^"]*"' urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ":" -f 2)
@@ -50,6 +56,7 @@ pseudo2=$(grep -o '"subtitle":"[^"]*"' urltempo | head -n 1 | sed 's/"//g' | cut
 pageTitle=$(grep -o 'pageTitle":".[^"]*' urltempo | sed 's/pageTitle":"//' | sed 's/ | Our Story on Snapchat//' | sed 's/ | Spotlight on Snapchat//' | sed 's/| Spotlight on Snapchat//')
 datareacthelmet=$(grep -o 'data-react-helmet="true">.[^<]*' urltempo | sed 's/data-react-helmet="true">//' | sed 's/ | Our Story on Snapchat//' | sed 's/|Spotlight on Snapchat//' | sed 's/ | Spotlight on Snapchat//')
 
+# différence video image
 if [ "${json[2]}" == "jpg" ];then
 echo "<tr><td><img src=\"${json[3]}\"/><br >" >> "$nom_fichier"
 else [ "${json[2]}" == "mp4" ];
@@ -104,16 +111,20 @@ done
 sed -i '1,4d' archive.json.tempo
 fi
 
-echo "Source: https://story.snapchat.com/o/${json[1]}<br >" >> "$nom_fichier"
+echo "Source: https://www.snapchat.com/spotlight/${json[1]}<br >" >> "$nom_fichier"
 echo "Snap date : $realdate<br >" >> "$nom_fichier"
+# modifier la date
 echo "</td></tr>" >> "$nom_fichier"
 done
 rm archive.json.tempo
+rm urltempo
 echo "</table>" >> "$nom_fichier"
 
+#echo "<p>Bonne analyse !</p>" >> "$nom_fichier"
 echo "</body>" >> "$nom_fichier"
 echo "</html>" >> "$nom_fichier"
 
+# Afficher un message de confirmation
 echo "New page html : $nom_fichier"
 
 exit
