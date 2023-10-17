@@ -39,9 +39,8 @@ json=($(head -n 4 archive.json.tempo))
 declare -a json
 datesnap=$(echo ${json[0]} | cut -c 1-10)
 realdate=$(date -d @$datesnap) # add 'u' for universal time UTC
-# shorturl=$(echo ${json[3]} | rev | cut -c13- | rev)
 
-#REMPLISSAGE DU TABLEAUsnap.html
+#REMPLISSAGE DU TABLEAU
 if grep -q "${json[1]}" "$nom_fichier";then
 sed -i '1,4d' archive.json.tempo
 else
@@ -113,18 +112,13 @@ fi
 
 echo "Source: https://www.snapchat.com/spotlight/${json[1]}<br >" >> "$nom_fichier"
 echo "Snap date : $realdate<br >" >> "$nom_fichier"
-# modifier la date
 echo "</td></tr>" >> "$nom_fichier"
 done
 rm archive.json.tempo
 rm urltempo
 echo "</table>" >> "$nom_fichier"
-
-#echo "<p>Bonne analyse !</p>" >> "$nom_fichier"
 echo "</body>" >> "$nom_fichier"
 echo "</html>" >> "$nom_fichier"
-
-# Afficher un message de confirmation
 echo "New page html : $nom_fichier"
 
 exit
