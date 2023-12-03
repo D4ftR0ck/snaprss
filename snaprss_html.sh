@@ -101,7 +101,7 @@ else
 echo "data-react-helmet : $datareacthelmet<br >" >> "$nom_fichier"
 fi
 
-myliste=("$titre" "$titre2" "$pseudo" "$pseudo2" "$pageTitle" "$datareacthelmet")
+myliste=("$title1" "$title2" "$subtitle1" "$subtitle2" "$pageTitle" "$datareacthelmet")
 last=""
 for var in "${myliste[@]}"; do
 if [[ "$var" != "$last" ]]; then
