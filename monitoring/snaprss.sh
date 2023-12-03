@@ -95,11 +95,11 @@ else
                 sleep $((3 + RANDOM % 7))
 
                 curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.snapchat.com/spotlight/${json[1]}" > $current_dir/${tempo[0]}/urltempo  #https://story.snapchat.com/o/
-                titre=$(grep -o '"title":"[^"]*"' $current_dir/${tempo[0]}/urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ':' -f 2)
-                titre2=$(grep -o '"title":"[^"]*"' $current_dir/${tempo[0]}/urltempo | head -n 1 | sed 's/"//g' | cut -d ':' -f 2)
+                title1=$(grep -o '"title":"[^"]*"' $current_dir/${tempo[0]}/urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ':' -f 2)
+                title2=$(grep -o '"title":"[^"]*"' $current_dir/${tempo[0]}/urltempo | head -n 1 | sed 's/"//g' | cut -d ':' -f 2)
 
-                pseudo=$(grep -o '"subtitle":"[^"]*"' $current_dir/${tempo[0]}/urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ":" -f 2)
-                pseudo2=$(grep -o '"subtitle":"[^"]*"' $current_dir/${tempo[0]}/urltempo | head -n 1 | sed 's/"//g' | cut -d ":" -f 2)
+                subtitle1=$(grep -o '"subtitle":"[^"]*"' $current_dir/${tempo[0]}/urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ":" -f 2)
+                subtitle2=$(grep -o '"subtitle":"[^"]*"' $current_dir/${tempo[0]}/urltempo | head -n 1 | sed 's/"//g' | cut -d ":" -f 2)
                 pageTitle=$(grep -o 'pageTitle":".[^"]*' $current_dir/${tempo[0]}/urltempo | sed 's/pageTitle":"//' | sed 's/ | Our Story on Snapchat//' | sed 's/ | Spotlight on Snapchat//' | sed 's/| Spotlight on Snapchat//')
                 datareacthelmet=$(grep -o 'data-react-helmet="true">.[^<]*' $current_dir/${tempo[0]}/urltempo | sed 's/data-react-helmet="true">//' | sed 's/ | Our Story on Snapchat//' | sed 's/|Spotlight on Snapchat//' | sed 's/ | Spotlight on Snapchat//')
 
@@ -111,33 +111,33 @@ else
                     else [ "${json[2]}" == "mp4" ];
                     echo -e '<description><![CDATA[<iframe width="1080" height="1920" src="\c' >> $current_dir/monitoring.xml
                     fi
-#local server python or nginx local server
+#local server OR nginx local server
 #                   echo -e "http://127.0.0.1:8556/${tempo[0]}/${json[1]}.${json[2]}\c" >> $current_dir/monitoring.xml
 #                   echo -e "http://localhost/snaprss/${tempo[0]}/${json[1]}.${json[2]}\c" >> $current_dir/monitoring.xml
                     echo '"/><br >' >> $current_dir/monitoring.xml
 
-                if echo "$titre" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
-                    echo "Titre1 :<br >" >> $current_dir/monitoring.xml
+                if echo "$title1" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
+                    echo "Title1 :<br >" >> $current_dir/monitoring.xml
                 else
-                    echo "Titre1 : $titre<br >" >> $current_dir/monitoring.xml
+                    echo "Title1 : $title1<br >" >> $current_dir/monitoring.xml
                 fi
 
-                if echo "$titre2" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
-                    echo "Titre2 :<br >" >> $current_dir/monitoring.xml
+                if echo "$title2" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
+                    echo "Title2 :<br >" >> $current_dir/monitoring.xml
                 else
-                    echo "Titre2 : $titre2<br >" >> $current_dir/monitoring.xml
+                    echo "Title2 : $title2<br >" >> $current_dir/monitoring.xml
                 fi
 
-                if echo "$pseudo" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
-                    echo "Pseudo1 :<br >" >> $current_dir/monitoring.xml
+                if echo "$subtitle1" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
+                    echo "Subtitle1 :<br >" >> $current_dir/monitoring.xml
                 else
-                    echo "Pseudo1 : $pseudo<br >" >> $current_dir/monitoring.xml
+                    echo "Subtitle1 : $subtitle1<br >" >> $current_dir/monitoring.xml
                 fi
 
-                if echo "$pseudo2" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
-                    echo "Pseudo2 :<br >" >> $current_dir/monitoring.xml
+                if echo "$subtitle2" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
+                    echo "Subtitle2 :<br >" >> $current_dir/monitoring.xml
                 else
-                    echo "Pseudo2 : $pseudo2<br >" >> $current_dir/monitoring.xml
+                    echo "Subtitle2 : $subtitle2<br >" >> $current_dir/monitoring.xml
                 fi
 
                 if echo "$pageTitle" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
@@ -152,7 +152,7 @@ else
                     echo "data-react-helmet : $datareacthelmet<br >" >> $current_dir/monitoring.xml
                 fi
 
-                myliste=("$titre" "$titre2" "$pseudo" "$pseudo2" "$pageTitle" "$datareacthelmet")
+                myliste=("$title1" "$title2" "$subtitle1" "$subtitle2" "$pageTitle" "$datareacthelmet")
                 last=""
                     for var in "${myliste[@]}"; do
                     if [[ "$var" != "$last" ]]; then
