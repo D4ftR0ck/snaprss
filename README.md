@@ -4,7 +4,7 @@ A stand-alone program that requires the jq library and creates an array in an ht
 
 Pivot from the snap snap_ID retrieved from the Snapmap. You only need GPS coordinates.
 
-https://www.snapchat.com/spotlight/(snap_ID)
+https://www.snapchat.com/spotlight/(snap_ID) or https://story.snapchat.com/o/(snap_ID)
 
 https://www.snapchat.com/add/(User)
 
