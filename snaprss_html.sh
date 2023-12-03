@@ -52,11 +52,11 @@ else
 sleep $((5 + RANDOM % 7))
 echo "Work with, create time: ${json[0]}, snap id : ${json[1]}, file type : ${json[2]}, url : ${json[3]}"
 
-curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.snapchat.com/spotlight/${json[1]}" > urltempo  # OR https://story.snapchat.com/o/${json[1]}
-titre=$(grep -o '"title":"[^"]*"' urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ':' -f 2)
-titre2=$(grep -o '"title":"[^"]*"' urltempo | head -n 1 | sed 's/"//g' | cut -d ':' -f 2)
-pseudo=$(grep -o '"subtitle":"[^"]*"' urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ":" -f 2)
-pseudo2=$(grep -o '"subtitle":"[^"]*"' urltempo | head -n 1 | sed 's/"//g' | cut -d ":" -f 2)
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.snapchat.com/spotlight/${json[1]}" > urltempo  # /spotlight/ fonctionne aussi. avec www ou https://story.snapchat.com/o/
+title1=$(grep -o '"title":"[^"]*"' urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ':' -f 2)
+title2=$(grep -o '"title":"[^"]*"' urltempo | head -n 1 | sed 's/"//g' | cut -d ':' -f 2)
+subtitle1=$(grep -o '"subtitle":"[^"]*"' urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ":" -f 2)
+subtitle2=$(grep -o '"subtitle":"[^"]*"' urltempo | head -n 1 | sed 's/"//g' | cut -d ":" -f 2)
 pageTitle=$(grep -o 'pageTitle":".[^"]*' urltempo | sed 's/pageTitle":"//' | sed 's/ | Our Story on Snapchat//' | sed 's/ | Spotlight on Snapchat//' | sed 's/| Spotlight on Snapchat//')
 datareacthelmet=$(grep -o 'data-react-helmet="true">.[^<]*' urltempo | sed 's/data-react-helmet="true">//' | sed 's/ | Our Story on Snapchat//' | sed 's/|Spotlight on Snapchat//' | sed 's/ | Spotlight on Snapchat//')
 
@@ -67,26 +67,26 @@ else [ "${json[2]}" == "mp4" ];
 echo "<tr><td><video controls width=\"1080\" height=\"1920\" src=\"${json[3]}\"/></video><br >" >> "$nom_fichier"
 fi
 
-if echo "$titre" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
-echo "Titre1 :<br >" >> "$nom_fichier"
+if echo "$title1" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
+echo "Title1 :<br >" >> "$nom_fichier"
 else
-echo "Titre1 : $titre<br >" >> "$nom_fichier"
+echo "Title1 : $title1<br >" >> "$nom_fichier"
 fi
-if echo "$titre2" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
-echo "Titre2 :<br >" >> "$nom_fichier"
+if echo "$title2" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
+echo "Title2 :<br >" >> "$nom_fichier"
 else
-echo "Titre2 : $titre2<br >" >> "$nom_fichier"
+echo "Title2 : $title2<br >" >> "$nom_fichier"
 fi
-if echo "$pseudo" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
-echo "Pseudo1 :<br >" >> "$nom_fichier"
+if echo "$subtitle1" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
+echo "Subtitle1 :<br >" >> "$nom_fichier"
 else
-echo "Pseudo1 : $pseudo<br >" >> "$nom_fichier"
+echo "Subtitle1 : $subtitle1<br >" >> "$nom_fichier"
 fi
 
-if echo "$pseudo2" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
-echo "Pseudo2 :<br >" >> "$nom_fichier"
+if echo "$subtitle2" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
+echo "Subtitle2 :<br >" >> "$nom_fichier"
 else
-echo "Pseudo2 : $pseudo2<br >" >> "$nom_fichier"
+echo "Subtitle2 : $subtitle2<br >" >> "$nom_fichier"
 fi
 
 if echo "$pageTitle" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
@@ -120,7 +120,6 @@ echo "Snap date : $realdate<br >" >> "$nom_fichier"
 # modifier la date
 echo "</td></tr>" >> "$nom_fichier"
 done
-
 rm archive.json.tempo
 rm urltempo
 echo "</table>" >> "$nom_fichier"
