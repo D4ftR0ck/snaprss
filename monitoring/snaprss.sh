@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#"location" doit avoir LIEU + GEOLOCALISATION GPS + distance 500 / 1000 ou +
 current_dir=$(dirname $(realpath -s $0))
 var_location=$(awk 'NR % 3 == 1' $current_dir/location)
 IFS=$'\n'
@@ -31,6 +31,7 @@ sed -i '$d' $current_dir/monitoring.xml
 sed -i '$d' $current_dir/monitoring.xml
 fi
 
+# UTILISATION DE SNAPMAP-ARCHIVER EN UTILISANT UN LOCATION TEMPO
 cp "$current_dir/location" "$current_dir/tempo1"
 cp "$current_dir/location" "$current_dir/tempo2"
 
@@ -63,11 +64,13 @@ sed -i '1,3d' $current_dir/tempo1
 done
 rm $current_dir/tempo1
 
-#Traitement monitoring
+#Traitement monitoring$
 while [ "$(wc -l < $current_dir/tempo2)" -gt 0 ];do
 tempo=($(head -n 3 $current_dir/tempo2))
 declare -a tempo
+# echo "$tempo est en cours de traitement"
 
+# si le fichier archive.json.tempo existe le script continue
 if [ ! -f $current_dir/${tempo[0]}/archive.json.tempo ];then
 sed -i '1,3d' $current_dir/tempo2
 
@@ -87,7 +90,7 @@ else
 
                 sleep $((3 + RANDOM % 5))
 
-                curl -s -o $current_dir/${tempo[0]}/${json[1]}.${json[2]} "${json[3]}"
+                curl -o $current_dir/${tempo[0]}/${json[1]}.${json[2]} "${json[3]}"
 
                 sleep $((3 + RANDOM % 7))
 
@@ -108,8 +111,9 @@ else
                     else [ "${json[2]}" == "mp4" ];
                     echo -e '<description><![CDATA[<iframe width="1080" height="1920" src="\c' >> $current_dir/monitoring.xml
                     fi
-                    echo -e "http://127.0.0.1:8556/${tempo[0]}/${json[1]}.${json[2]}\c" >> $current_dir/monitoring.xml
-#                    echo -e "http://localhost/snaprss/${tempo[0]}/${json[1]}.${json[2]}\c" >> $current_dir/monitoring.xml
+#local server python or nginx local server
+#                   echo -e "http://127.0.0.1:8556/${tempo[0]}/${json[1]}.${json[2]}\c" >> $current_dir/monitoring.xml
+#                   echo -e "http://localhost/snaprss/${tempo[0]}/${json[1]}.${json[2]}\c" >> $current_dir/monitoring.xml
                     echo '"/><br >' >> $current_dir/monitoring.xml
 
                 if echo "$titre" | grep -Eq "'s Sound|Spotlight Sound|Our Story on Snapchat|OVF Editor|Created for Spotlight|Tap to try it out\!|Spotlight on Snapchat|Create My Bitmoji|Your identity on Snapchat"; then
@@ -167,6 +171,7 @@ else
                 echo "<pubDate>$datexml</pubDate>" >> $current_dir/monitoring.xml
                 echo "</item>" >> $current_dir/monitoring.xml
                 sed -i '1,4d' $current_dir/${tempo[0]}/archive.json.tempo
+                #rm $current_dir/${tempo[0]}/urltempo
                 fi
     done
 sed -i '1,3d' $current_dir/tempo2
