@@ -120,11 +120,11 @@ echo "Snap date : $realdate<br >" >> "$nom_fichier"
 # modifier la date
 echo "</td></tr>" >> "$nom_fichier"
 done
+
 rm archive.json.tempo
 rm urltempo
 echo "</table>" >> "$nom_fichier"
 
-#echo "<p>Bonne analyse !</p>" >> "$nom_fichier"
 echo "</body>" >> "$nom_fichier"
 echo "</html>" >> "$nom_fichier"
 
