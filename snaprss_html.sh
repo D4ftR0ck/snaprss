@@ -21,7 +21,7 @@ jq -r '.[] | .create_time, .snap_id, .file_type, .url' archive.json > archive.js
 # Nom du fichier HTML
 nom_fichier=$(echo "$namefile.html")
 
-# Ouvrir du fichier HTML
+# Ouvrir le fichier en mode écriture
 echo "<html>" > "$nom_fichier"
 echo "<head>" >> "$nom_fichier"
 echo "<title>SNAPRSS HTML</title>" >> "$nom_fichier"
@@ -31,6 +31,9 @@ echo "<h1>Report Snaprss</h1>" >> "$nom_fichier"
 
 # Créer un tableau HTML
 echo "<table border='1'>" >> "$nom_fichier"
+
+# ajouter une condition si archive.json.tempo vide
+
 echo "<tr><th>Snap html</th></tr>" >> "$nom_fichier"
 
 #Traitement
@@ -39,15 +42,17 @@ json=($(head -n 4 archive.json.tempo))
 declare -a json
 datesnap=$(echo ${json[0]} | cut -c 1-10)
 realdate=$(date -d @$datesnap) # add 'u' for universal time UTC
+# shorturl=$(echo ${json[3]} | rev | cut -c13- | rev)
 
 #REMPLISSAGE DU TABLEAU
-if grep -q "${json[1]}" "$nom_fichier";then
+if grep -q "${json[1]}" "$nom_fichier";then #verification que l'id existe pas déjà
 sed -i '1,4d' archive.json.tempo
 else
+
 sleep $((5 + RANDOM % 7))
 echo "Work with, create time: ${json[0]}, snap id : ${json[1]}, file type : ${json[2]}, url : ${json[3]}"
 
-curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.snapchat.com/spotlight/${json[1]}" > urltempo  # or https://story.snapchat.com/o/
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.snapchat.com/spotlight/${json[1]}" > urltempo  # /spotlight/ fonctionne aussi. avec www ou https://story.snapchat.com/o/
 titre=$(grep -o '"title":"[^"]*"' urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ':' -f 2)
 titre2=$(grep -o '"title":"[^"]*"' urltempo | head -n 1 | sed 's/"//g' | cut -d ':' -f 2)
 pseudo=$(grep -o '"subtitle":"[^"]*"' urltempo | head -n 2 | tail -n 1 | sed 's/"//g' | cut -d ":" -f 2)
@@ -112,13 +117,18 @@ fi
 
 echo "Source: https://www.snapchat.com/spotlight/${json[1]}<br >" >> "$nom_fichier"
 echo "Snap date : $realdate<br >" >> "$nom_fichier"
+# modifier la date
 echo "</td></tr>" >> "$nom_fichier"
 done
 rm archive.json.tempo
 rm urltempo
 echo "</table>" >> "$nom_fichier"
+
+#echo "<p>Bonne analyse !</p>" >> "$nom_fichier"
 echo "</body>" >> "$nom_fichier"
 echo "</html>" >> "$nom_fichier"
+
+# Afficher un message de confirmation
 echo "New page html : $nom_fichier"
 
 exit
